@@ -7,7 +7,7 @@ const Button = ({ text, type = 'button', onClick }) => (
   </StyledButton>
 );
 
-export default Button;
+export { Button };
 
 Button.propTypes = {
   text: PropTypes.string.isRequired,

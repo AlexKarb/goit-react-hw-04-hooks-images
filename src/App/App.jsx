@@ -1,59 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Button, ErrorMessage, Loader } from '../Utils';
 import api from '../service/image-api';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import Searchbar from '../Searchbar/Searchbar';
 import ModalWindow from '../Modal/Modal';
-import Loader from '../Utils/Loader/Loader';
-import Button from '../Utils/Button/Button';
-import ErrorMessage from '../Utils/ErrorMessage/ErrorMessage';
+import smoothScroll from 'helpers/smothScroll';
 
 const App = () => {
   const [images, setImages] = useState([]);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(null);
-  const [searchRequest, setSearchRequest] = useState('');
+  const [dataRequest, setDataRequest] = useState({ request: '', page: 1 });
   const [activeImage, setActiveImage] = useState(null);
   const [status, setStatus] = useState('idle');
-  const [error, setError] = useState(null);
+  //
+  const cardEl = useRef(null);
 
-  const setResolvedRequest = ({ hits, total }) => {
-    setImages(img => [...img, ...hits]);
-    setTotal(total);
+  const setResolvedRequest = arrayOfImg => {
+    setImages(img => [...img, ...arrayOfImg]);
     setStatus('resolved');
-    if (page !== 1) smoothScroll();
   };
 
-  const setRejectedRequest = error => {
-    setError(error);
-    setStatus('rejected');
-  };
+  const setRejectedRequest = error =>
+    setStatus({ status: 'rejected', message: error });
 
   useEffect(() => {
-    setStatus('loading');
-    return api
-      .getImages(searchRequest, page)
-      .then(setResolvedRequest)
-      .catch(setRejectedRequest);
-  }, [page, searchRequest]);
+    if (dataRequest.request === '') {
+      return;
+    }
 
-  const smoothScroll = () =>
-    window.scrollBy({
-      top: 430,
-      behavior: 'smooth',
-    });
+    setStatus('loading');
+    api
+      .getImages(dataRequest)
+      .then(setResolvedRequest)
+      .catch(setRejectedRequest)
+      .finally(() => smoothScroll(cardEl.current, dataRequest.page));
+  }, [dataRequest]);
 
   const onSubmit = searchRequest => {
-    setSearchRequest(searchRequest);
-    setTotal(null);
-    setPage(1);
+    setDataRequest({ request: searchRequest, page: 1 });
     setImages([]);
   };
 
   const Success = status === 'resolved';
   const isLoading = status === 'loading';
-  const Error = status === 'rejected';
+  const Error = status.status === 'rejected';
 
-  const endOfColection = Math.ceil(total / 12) === page;
+  const endOfColection = images.length % 12 !== 0;
   const imageIsFound = images.length > 0;
   const showButton = !endOfColection && imageIsFound && Success;
 
@@ -62,19 +53,23 @@ const App = () => {
       <Searchbar onSubmit={onSubmit} />
 
       {imageIsFound && (
-        <ImageGallery images={images} setActiveImage={setActiveImage} />
+        <ImageGallery
+          images={images}
+          ref={cardEl}
+          setActiveImage={setActiveImage}
+        />
       )}
 
       {showButton && (
         <Button
           text="Load more"
           onClick={() => {
-            setPage(page => page + 1);
+            setDataRequest(state => ({ ...state, page: state.page + 1 }));
           }}
         />
       )}
 
-      {Error && <ErrorMessage text={error} />}
+      {Error && <ErrorMessage text={status.message} />}
 
       {isLoading && <Loader />}
 

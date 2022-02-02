@@ -8,4 +8,4 @@ const Loader = () => (
   </Spiner>
 );
 
-export default Loader;
+export { Loader };

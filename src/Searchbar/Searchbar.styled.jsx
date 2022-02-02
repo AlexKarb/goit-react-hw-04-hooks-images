@@ -46,4 +46,10 @@ const FormInput = styled(Field)`
   }
 `;
 
-export { HeaderContainer, StyledForm, FormInput };
+const TextError = styled.p`
+  padding-right: 24px;
+  padding-left: 24px;
+  color: red;
+`;
+
+export { HeaderContainer, StyledForm, FormInput, TextError };

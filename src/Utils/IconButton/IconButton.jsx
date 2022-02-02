@@ -8,7 +8,7 @@ const IconButton = ({ icon, dataAction, type = 'button', onClick }) => (
   </Button>
 );
 
-export default IconButton;
+export { IconButton };
 
 IconButton.propTypes = {
   icon: PropTypes.element.isRequired,

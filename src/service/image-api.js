@@ -18,15 +18,15 @@ const DATA_API = {
   },
 };
 
-const getImages = async (searchRequest, page) => {
-  DATA_API.q = searchRequest;
+const getImages = async ({ request, page }) => {
+  DATA_API.q = request;
   DATA_API.page = page;
 
   const response = await axios(`?${DATA_API.createApiConfiguration()}`);
 
   return new Promise((resolve, reject) => {
     if (response.data.hits.length > 0) {
-      resolve(response.data);
+      resolve(response.data.hits);
     } else {
       reject('Not found images');
     }

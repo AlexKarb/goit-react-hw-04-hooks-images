@@ -1,11 +1,12 @@
+import { forwardRef } from 'react';
 import { Item, Image } from './ImageGalleryItem.styled';
 import PropTypes from 'prop-types';
 
-const ImageGalleryItem = ({ src, alt, onClick }) => (
-  <Item onClick={onClick}>
+const ImageGalleryItem = forwardRef(({ src, alt, onClick }, ref) => (
+  <Item onClick={onClick} ref={ref}>
     <Image src={src} alt={alt} />
   </Item>
-);
+));
 
 export default ImageGalleryItem;
 

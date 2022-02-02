@@ -1,11 +1,13 @@
+import { forwardRef } from 'react';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import List from './ImageGallery.styled';
 import PropTypes from 'prop-types';
 
-const ImageGallery = ({ images, setActiveImage }) => (
+const ImageGallery = forwardRef(({ images, setActiveImage }, ref) => (
   <List>
     {images.map(img => (
       <ImageGalleryItem
+        ref={ref}
         src={img.webformatURL}
         alt={img.tags}
         key={img.webformatURL}
@@ -13,7 +15,7 @@ const ImageGallery = ({ images, setActiveImage }) => (
       />
     ))}
   </List>
-);
+));
 
 export default ImageGallery;
 
